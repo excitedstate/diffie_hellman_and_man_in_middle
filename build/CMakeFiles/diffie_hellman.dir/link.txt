@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/diffie_hellman.dir/main.c.o  -o diffie_hellman  -lcrypto 

@@ -1,0 +1,5 @@
+# COURSE_DESIGN_CHANGE_LOG
+
+## 2021.07.09 START
+
+1. 搭建LINUX开发环境, 安装`OPENSSL`函数库用于加解密等

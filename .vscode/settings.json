@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "aes.h": "c",
+        "main.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "stdbool.h": "c",
+        "md5.h": "c"
+    }
+}
