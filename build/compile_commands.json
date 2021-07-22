@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/bing/diffie_hellman/build",
-  "command": "/usr/bin/cc   -g   -std=gnu99 -o CMakeFiles/diffie_hellman.dir/main.c.o   -c /home/bing/diffie_hellman/main.c",
-  "file": "/home/bing/diffie_hellman/main.c"
-}
-]

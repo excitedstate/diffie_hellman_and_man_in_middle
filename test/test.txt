@@ -1,0 +1,5 @@
+IP address       HW type     Flags       HW address            Mask     Device
+192.168.234.128  0x1         0x2         00:0c:29:52:8c:17     *        vmnet8
+192.168.234.129  0x1         0x2         00:0c:29:ea:23:21     *        vmnet8
+192.168.234.187  0x1         0x0         00:00:00:00:00:00     *        vmnet8
+10.236.255.254   0x1         0x2         58:69:6c:a6:8f:09     *        wlp58s0
