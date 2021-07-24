@@ -6,11 +6,29 @@
 
 #IncludeRegexTransform: 
 
+/home/bing/文档/projects/vscode/diffie_hellman/main.c
+src/main.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/main.h
+src/dh_comm.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_comm.h
+src/arpspoof.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/arpspoof.h
+src/man_in_middle.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/man_in_middle.h
+
+/home/bing/文档/projects/vscode/diffie_hellman/src/arpspoof.h
+main.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/main.h
+
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_comm.c
 dh_comm.h
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_comm.h
 
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_comm.h
+dh_protocol.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
+
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.c
 dh_protocol.h
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
 
@@ -54,5 +72,11 @@ openssl/aes.h
 openssl/sha.h
 -
 openssl/evp.h
+-
+
+/home/bing/文档/projects/vscode/diffie_hellman/src/man_in_middle.h
+dh_protocol.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
+dlfcn.h
 -
 

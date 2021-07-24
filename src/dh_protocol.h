@@ -75,7 +75,14 @@ typedef enum dh_key_exchange_pkt_type {
 /*=============================EXTERN VARIABLES===========================*/
 extern const char MSG_INFO[16][256];
 #ifdef USE_PSK
-extern char PSK[32];
+extern char PSK_INIT[33];
+extern char PSK_P[33];
+extern char PSK_G[33];
+extern char PSK_Y[33];
+extern char PSK_K[33];
+
+void dh_generate_all_psk(const char *psk IN_ARG);
+
 #endif
 /*=============================EXTERN FUNCTIONS===========================*/
 // PART ONE: ABOUT MESSAGE
@@ -127,7 +134,7 @@ bool dh_key_exchange_response(DH_MSG *dh_msg_req,
 /**
  * make communication packet...
  */
-bool dh_dialogue(DH_MSG *dh_msg_req, u_char *data, uint8_t size);
+bool dh_dialogue(DH_MSG *dh_msg_req OUT_ARG, u_char *data IN_ARG, uint8_t size IN_ARG);
 
 
 /**

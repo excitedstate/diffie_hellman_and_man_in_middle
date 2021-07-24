@@ -11,6 +11,7 @@
         "in.h": "c",
         "string.h": "c",
         "ethernet.h": "c",
-        "if_arp.h": "c"
+        "if_arp.h": "c",
+        "dh_comm.h": "c"
     }
 }

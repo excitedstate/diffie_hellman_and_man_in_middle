@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/server_safe.dir/main.c.o CMakeFiles/server_safe.dir/src/dh_protocol.c.o CMakeFiles/server_safe.dir/src/dh_comm.c.o  -o bin/server_safe  -lcrypto -lpcap -lssl -lpthread 
+/usr/bin/cc -g CMakeFiles/server_safe.dir/main.c.o CMakeFiles/server_safe.dir/src/dh_protocol.c.o CMakeFiles/server_safe.dir/src/dh_comm.c.o -o bin/server_safe  -lcrypto -lpcap -lssl -lpthread 

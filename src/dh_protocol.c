@@ -18,7 +18,25 @@ const unsigned char DH_GCM_AAD[16] = {
 };
 
 #ifdef USE_PSK
-char PSK[32] = {0};
+char PSK_INIT[33] = {0}; // the first key from the user
+char PSK_P[33] = {0};  // the key for p, sha(PSK_INIT)
+char PSK_G[33] = {0};  // the key for g, sha(PSK_P)
+char PSK_Y[33] = {0};  // the key for y_a/y_b, sha(PSK_G)
+char PSK_K[33] = {0};  // the key for shared key, sha(PSK_K)
+
+void dh_generate_all_psk(const char *psk) {
+    memset(PSK_INIT, 0, 33);
+    memset(PSK_P, 0, 33);
+    memset(PSK_G, 0, 33);
+    memset(PSK_Y, 0, 33);
+    memset(PSK_K, 0, 33);
+    SHA256((u_char *) psk, 32, (u_char *) PSK_INIT);
+    SHA256((u_char *) PSK_INIT, 32, (u_char *) PSK_P);
+    SHA256((u_char *) PSK_P, 32, (u_char *) PSK_G);
+    SHA256((u_char *) PSK_G, 32, (u_char *) PSK_Y);
+    SHA256((u_char *) PSK_Y, 32, (u_char *) PSK_K);
+}
+
 #endif
 
 /** used by functions for making packet
@@ -98,8 +116,8 @@ bool dh_generate_shared_key(DH *d, BIGNUM *pub_key, u_char *shared_key) {
 #ifdef USE_PSK
         char old_shared_key[32];
         memcpy(old_shared_key, shared_key, 32);
-        show_packet((u_char *) PSK, 32);
-        dh_aes_256_gcm_encrypt((u_char *) PSK, (u_char *) old_shared_key, 32, shared_key);
+        show_packet((u_char *) PSK_K, 32);
+        dh_aes_256_gcm_encrypt((u_char *) PSK_K, (u_char *) old_shared_key, 32, shared_key);
 #endif
         if (res < 1) {
             dh_error_handle("compute shared key error.");
@@ -123,9 +141,19 @@ bool dh_cvt_dh2msg(DH *dh,
         char *prime = BN_bn2hex(dh->p);
         char *generator = BN_bn2hex(dh->g);
         char *pubkeyA = BN_bn2hex(dh->pub_key);
-        dh_set_dh_msg_item(dh_msg, (u_char *) prime, strlen(prime));
-        dh_set_dh_msg_item(dh_msg, (u_char *) generator, strlen(generator));
-        dh_set_dh_msg_item(dh_msg, (u_char *) pubkeyA, strlen(pubkeyA));
+#ifdef USE_PSK
+        // handle the params
+        char temp_buffer[65];
+        memcpy(temp_buffer, prime, 65);
+        dh_aes_256_gcm_encrypt((u_char *) PSK_P, (u_char *) temp_buffer, strlen(prime), (u_char *) prime);
+        memcpy(temp_buffer, generator, 65);
+        dh_aes_256_gcm_encrypt((u_char *) PSK_G, (u_char *) temp_buffer, strlen(generator), (u_char *) generator);
+        memcpy(temp_buffer, pubkeyA, 65);
+        dh_aes_256_gcm_encrypt((u_char *) PSK_Y, (u_char *) temp_buffer, strlen(pubkeyA), (u_char *) pubkeyA);
+#endif
+        dh_set_dh_msg_item(dh_msg, (u_char *) prime, 64);
+        dh_set_dh_msg_item(dh_msg, (u_char *) generator, 2);
+        dh_set_dh_msg_item(dh_msg, (u_char *) pubkeyA, 64);
         OPENSSL_free(prime);
         OPENSSL_free(generator);
         OPENSSL_free(pubkeyA);
@@ -134,7 +162,13 @@ bool dh_cvt_dh2msg(DH *dh,
         dh_msg->head.para_size = 1;
         dh_msg->body.valid_length = 0;
         char *pubkey_B = BN_bn2hex(dh->pub_key);
-        dh_set_dh_msg_item(dh_msg, (u_char *) pubkey_B, strlen(pubkey_B));
+#ifdef USE_PSK
+        // handle the params
+        char temp_buffer[65];
+        memcpy(temp_buffer, pubkey_B, 65);
+        dh_aes_256_gcm_encrypt((u_char *) PSK_Y, (u_char *) temp_buffer, strlen(temp_buffer), (u_char *) pubkey_B);
+#endif
+        dh_set_dh_msg_item(dh_msg, (u_char *) pubkey_B, 64);
         OPENSSL_free(pubkey_B);
     }
 #ifdef DEBUG_FLAG
@@ -151,8 +185,11 @@ int dh_cvt_dh_msg2bytes(DH_MSG *dh_msg, u_char *out, size_t max_size) {
     out[0] = dh_msg->head.type;
     out[1] = dh_msg->head.para_size;
     max_size -= 2;
-    dh_put_msg_params(dh_msg, out + 2, &max_size);
-    return (int) max_size + 2;
+    if (dh_put_msg_params(dh_msg, out + 2, &max_size)) {
+        return (int) max_size + 2;
+    } else {
+        return -1;
+    }
 }
 
 
@@ -223,7 +260,6 @@ bool dh_key_exchange_response(DH_MSG *dh_msg_req, DH *d, DH_MSG *dh_msg) {
     // params -> dh_msg
     dh_cvt_dh2msg(d, DH_KEY_EXCHANGE_PKT_TYPE_RES, dh_msg);
     return true;
-
 }
 
 /**

@@ -19,8 +19,15 @@ int server_init(const char *bind_ip IN_ARG, u_short bind_port IN_ARG);
  */
 int client_init(const char *serv_ip IN_ARG, u_short serv_port IN_ARG);
 
+/**
+ * 
+ * @brief 接收线程定义
+ */
 void *recv_thread(void *args IN_ARG);
 
+/**
+ * @brief 使用套接字开始回话，并使用shared_key对通信数据加密和解密。
+ */
 int start_dialog(int sock_fd IN_ARG, u_char *shared_key IN_ARG);
 
 /**

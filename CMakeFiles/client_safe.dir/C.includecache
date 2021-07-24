@@ -14,6 +14,10 @@ dh_comm.h
 dh_protocol.h
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
 
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.c
+dh_protocol.h
+/home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
+
 /home/bing/文档/projects/vscode/diffie_hellman/src/dh_protocol.h
 main.h
 /home/bing/文档/projects/vscode/diffie_hellman/src/main.h

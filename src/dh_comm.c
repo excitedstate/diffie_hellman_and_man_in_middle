@@ -165,7 +165,7 @@ int server(const char *bind_ip IN_ARG, u_short bind_port IN_ARG) {
 #else
 
     int server(const char *bind_ip IN_ARG, u_short bind_port IN_ARG, const char *psk) {
-        SHA256((u_char *) psk, 32, (u_char *) PSK);
+        dh_generate_all_psk(psk);
 #endif
     // ...
     char server_buf[DH_BUF_SIZE];
@@ -198,9 +198,30 @@ int server(const char *bind_ip IN_ARG, u_short bind_port IN_ARG) {
         goto err;
     }
     dh_parse_packet((u_char *) server_buf, &dh_msg_key_ex_req);
+#ifdef USE_PSK
+    char d_p_buffer[65] = {0};
+    char d_g_buffer[65] = {0};
+    char d_y_buffer[65] = {0};
+    char n_p_buffer[65] = {0};
+    char n_g_buffer[65] = {0};
+    char n_y_buffer[65] = {0};
+    // got
+    size_t size_p = dh_get_dh_msg_item(&dh_msg_key_ex_req, 0, (u_char *) d_p_buffer, 65);
+    size_t size_g = dh_get_dh_msg_item(&dh_msg_key_ex_req, 1, (u_char *) d_g_buffer, 65);
+    size_t size_y = dh_get_dh_msg_item(&dh_msg_key_ex_req, 2, (u_char *) d_y_buffer, 65);
+    dh_aes_256_gcm_decrypt((u_char *) PSK_P, (u_char *) d_p_buffer, size_p, (u_char *) n_p_buffer);
+    dh_aes_256_gcm_decrypt((u_char *) PSK_G, (u_char *) d_g_buffer, size_g, (u_char *) n_g_buffer);
+    dh_aes_256_gcm_decrypt((u_char *) PSK_Y, (u_char *) d_y_buffer, size_y, (u_char *) n_y_buffer);
+    memset(&dh_msg_key_ex_req, 0, sizeof(dh_msg_key_ex_req));
+    dh_msg_key_ex_req.head.type = DH_KEY_EXCHANGE_REQ;
+    dh_msg_key_ex_req.head.para_size = 0x03;
+    dh_set_dh_msg_item(&dh_msg_key_ex_req, (u_char *) n_p_buffer, 64);
+    dh_set_dh_msg_item(&dh_msg_key_ex_req, (u_char *) n_g_buffer, 2);
+    dh_set_dh_msg_item(&dh_msg_key_ex_req, (u_char *) n_y_buffer, 64);
+    // got p, g
+#endif
     puts("key change request from client.");
     dh_show_message(&dh_msg_key_ex_req);
-
     // 2. set g, p to dh_rsp with req and generate dh_msg in rsp
     ret = dh_key_exchange_response(&dh_msg_key_ex_req, dh_rsp, &dh_msg_key_ex_rsp);
     if (ret == false) {
@@ -217,7 +238,7 @@ int server(const char *bind_ip IN_ARG, u_short bind_port IN_ARG) {
         goto err;
     }
     puts("key change response to client.");
-    dh_show_message(&dh_msg_key_ex_rsp);
+//    dh_show_message(&dh_msg_key_ex_rsp);
     // 4. generate the shared key
     BIGNUM *pub_key = NULL;
     dh_get_dh_msg_item(&dh_msg_key_ex_req, 2, (u_char *) pubkey_str, 65);
@@ -248,10 +269,10 @@ int client(const char *serv_ip IN_ARG, u_short serv_port IN_ARG) {
 #else
 
     int client(const char *serv_ip IN_ARG, u_short serv_port IN_ARG, const char *psk) {
-        SHA256((u_char *) psk, 32, (u_char *) PSK);
+        dh_generate_all_psk(psk);
 #endif
     // ...
-    printf("will connected to %s:%d\n", serv_ip,serv_port);
+    printf("will connected to %s:%d\n", serv_ip, serv_port);
     char client_buf[DH_BUF_SIZE];
     char shared_key[32];
     u_char pubkey_str[65];
@@ -267,6 +288,7 @@ int client(const char *serv_ip IN_ARG, u_short serv_port IN_ARG) {
     }
     // ........... dh protocol........................//
     // 1. got g, p Y_a
+    // if define USE_PSK, handle it
     int ret = dh_key_exchange_request(dh_req, &dh_msg_key_ex_req);
     if (ret == false) {
         goto err;
@@ -287,9 +309,20 @@ int client(const char *serv_ip IN_ARG, u_short serv_port IN_ARG) {
         goto err;
     }
     dh_parse_packet((u_char *) client_buf, &dh_msg_key_ex_rsp);
+#ifdef USE_PSK
+    char d_y_buffer[65] = {0};
+    char n_y_buffer[65] = {0};
+    // got
+    size_t size_y = dh_get_dh_msg_item(&dh_msg_key_ex_rsp, 0, (u_char *) d_y_buffer, 65);
+    dh_aes_256_gcm_decrypt((u_char *) PSK_Y, (u_char *) d_y_buffer, size_y, (u_char *) n_y_buffer);
+    memset(&dh_msg_key_ex_rsp, 0, sizeof(dh_msg_key_ex_rsp));
+    dh_msg_key_ex_rsp.head.type = DH_KEY_EXCHANGE_RES;
+    dh_msg_key_ex_rsp.head.para_size = 0x01;
+    dh_set_dh_msg_item(&dh_msg_key_ex_rsp, (u_char *) n_y_buffer, strlen(n_y_buffer));
+    // got p, g
+#endif
     puts("key change response from server.");
     dh_show_message(&dh_msg_key_ex_rsp);
-
     // 4. generate the shared key
     BIGNUM *pub_key = NULL;
     dh_get_dh_msg_item(&dh_msg_key_ex_rsp, 0, pubkey_str, 65);

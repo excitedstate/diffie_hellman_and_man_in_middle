@@ -1,3 +1,0 @@
-/home/bing/diffie_hellman/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/bing/diffie_hellman/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/bing/diffie_hellman/cmake-build-debug/CMakeFiles/diffie_hellman.dir

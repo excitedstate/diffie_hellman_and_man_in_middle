@@ -37,6 +37,11 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}/home/bing/文档/projects/vscode/diffie_hellman/lib/libman_in_middle_plugin.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}/home/bing/文档/projects/vscode/diffie_hellman/lib/libman_in_middle_plugin.so")
