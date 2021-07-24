@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -g -shared -Wl,-soname,libman_in_middle_plugins.so -o libman_in_middle_plugins.so CMakeFiles/man_in_middle_plugins.dir/src/default_plugin.c.o 

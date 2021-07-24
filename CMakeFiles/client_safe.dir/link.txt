@@ -1,1 +1,0 @@
-/usr/bin/cc -g CMakeFiles/client_safe.dir/main.c.o CMakeFiles/client_safe.dir/src/dh_protocol.c.o CMakeFiles/client_safe.dir/src/dh_comm.c.o -o bin/client_safe  -lcrypto -lpcap -lssl -lpthread 
